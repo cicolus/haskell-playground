@@ -9,13 +9,23 @@ dispatch "add" = add
 dispatch "view" = view
 dispatch "remove" = remove
 dispatch "bump" = bump
+dispatch command = doesntExist command
+
+doesntExist :: String -> [String] -> IO ()
+doesntExist command _ = putStrLn $ "The " ++ command ++ " command doesn't exist"
 
 main = do
-    (command:argList) <- getArgs
-    dispatch command argList
+    bracketOnError getArgs
+        (\_ -> do
+            putStrLn $ "expected usage: ./todo [command] [fileName] \n"
+                ++ "with optional trialing [itemNo.]")
+        (\(command:argList) ->
+            dispatch command argList)
 
 add :: [String] -> IO ()
 add [fileName, todoItem] = appendFile fileName (todoItem ++ "\n")
+add _ = do
+    putStrLn "expected usage: ./todo add [fileName] [todoItem]"
 
 view :: [String] -> IO ()
 view [fileName] = do
@@ -24,6 +34,8 @@ view [fileName] = do
         numberedTasks = zipWith (\n line -> show n ++ " - " ++ line)
                         [0..] todoTasks
     putStr $ unlines numberedTasks
+view _ = do
+    putStrLn "expected usage: ./todo view [fileName]"
 
 remove :: [String] -> IO ()
 remove [fileName, numberString] = do
@@ -44,6 +56,8 @@ remove [fileName, numberString] = do
             hClose tempHandle
             removeFile "todo.txt"
             renameFile tempName "todo.txt")
+remove _ = do
+    putStrLn "expected usage: ./todo remove [fileName] [itemNo.]"
 
 bump :: [String] -> IO ()
 bump [fileName, numberString] = do
@@ -64,4 +78,5 @@ bump [fileName, numberString] = do
             hClose tempHandle
             removeFile "todo.txt"
             renameFile tempName "todo.txt")
-
+bump _ = do
+    putStrLn "expected usage: ./todo bump [fileName] [itemNo.]"
