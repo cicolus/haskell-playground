@@ -1,9 +1,10 @@
 import System.IO
 import System.Directory
 import Data.List
+import Control.Exception
 
 main = do
-    content <- readFile "todo.txt"
+    contents <- readFile "todo.txt"
     let todoTasks = lines contents
         numberedTasks = zipWith (\n line -> show n ++ " - " ++ line)
                                     [0..] todoTasks
@@ -13,9 +14,12 @@ main = do
     numberString <- getLine
     let number = read numberString
         newTodoItems = unlines $ delete (todoTasks !! number) todoTasks
-    (tempName, tempHandle) <- openTempFile "." "temp"
-    hPutStr tempHandle newTodoItems
-    hClose tempHandle
-    removeFile "todo.txt"
-    renameFile tempName "todo.txt"
-
+    bracketOnError (openTempFile "." "temp")
+        (\(tempName, tempHandle) -> do
+            hClose tempHandle
+            removeFile tempName)
+        (\(tempName, tempHandle) -> do
+            hPutStr tempHandle newTodoItems
+            hClose tempHandle
+            removeFile "todo.txt"
+            renameFile tempName "todo.txt")
