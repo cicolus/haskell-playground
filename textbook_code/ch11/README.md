@@ -56,4 +56,24 @@ All is clear. Apparently, the applicative function is simply performing a result
 
 
 ## Applicative Functor Laws
+ * `pure id <*> v = v`
+ * `pure (.) <*> u <*> v <*> w = u <*> (v <*> w)`
+ * `pure f <*> pure x = pure (f x)`
+ * `u <*> pure y = pure ($ y) <*> u`
 
+## `sequenceA` function
+
+```haskell
+ghci> sequenceA [(+3),(+2),(+1)] 3
+[6, 5, 4]
+```
+Let's again look at the type:
+```haskell
+sequenceA :: (Applicative f) -> [f a] -> f [a]
+```
+We can see that here each element in the list is of type `Int -> Int`. So to write
+it in an *Applicative* flavor, its type is `(->) Int Int`. From this, we see
+clearly that the Applicative functor is actually `(->) Int` and type parameter `a`
+is `Int`. So the resulting type should be `(->) Int [Int]`, which in a more
+human-friendly way of representation is `Int -> [Int]`. Each element of the list is
+bind to the original functions, and takes a shared argument fed by the next value.
