@@ -22,4 +22,8 @@ instance Monda Maybe where
     Just x >>= f  = f x
     fail _ = Nothing
 
-
+-- translation of nondeterministic into Monad
+instance Monad [] where
+    return x = [x]
+    xs >>= f = concat (map f xs)
+    fail _ = []
