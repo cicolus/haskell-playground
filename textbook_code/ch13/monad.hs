@@ -27,3 +27,25 @@ instance Monad [] where
     return x = [x]
     xs >>= f = concat (map f xs)
     fail _ = []
+
+-- MonadPlus is a type class for a type that's both Monad and Monoid
+class Monad m => MonadPlus m where
+    mzero :: m a
+    mplus :: m a -> m a -> m a
+
+instance MonadPlus [] where
+    mzero = []
+    mplus = (++)
+
+-- Defined in `Control.Monad`
+guard :: (MonadPlust m) => Bool -> m ()
+guard True = return ()
+guard False = mzero
+
+-- usage of guard
+sevensOnly :: [Int]
+sevensOnly = do
+    x <- [1..50]
+    guard ('7' `elem` show x)
+    return x
+

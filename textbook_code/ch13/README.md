@@ -47,3 +47,11 @@ end. Sometimes, it is prefered to write `Nothing` in this way to be clearer:
 ```haskell
     \_ -> Nothing
 ```
+
+## Monadic Laws
+1. `return x >>= f` is the same as `f x`
+
+Example:
+```haskell
+ghci> return "WoM" >>= (\x -> [x, x, x])
+```
