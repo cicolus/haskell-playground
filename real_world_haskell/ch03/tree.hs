@@ -29,3 +29,8 @@ fooTree = TreeM $ Just ("root",
                     TreeM $ Just ("left", TreeM Nothing, TreeM Nothing),
                     TreeM $ Just ("right", TreeM Nothing, TreeM Nothing))
 
+
+-- exercise 9 on page 70
+height :: Tree a -> Int
+height Empty = 0
+height (Node val left right) = 1 + max (height left) (height right)

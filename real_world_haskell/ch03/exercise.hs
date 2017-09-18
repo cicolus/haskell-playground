@@ -1,3 +1,6 @@
+import Test.QuickCheck
+import Data.List
+
 teesst :: Integer -> Integer
 teesst n = foo $ bar n
     where foo 0 = 0
@@ -34,13 +37,33 @@ mean :: (Num a, Fractional a) => [a] -> a
 mean = (/) <$> sum <*> (fromIntegral . length) 
 
 -- exercise 4
+palindrome :: [a] -> [a]
+palindrome = (++) <$> id <*> reverse
+
+-- exercise 5
+isPalindrome :: (Eq a) => [a] -> Bool
+isPalindrome xs = xs == (palindrome $ take (length xs `div` 2) xs)
+
+-- exercise 6
+sortByLength :: [[a]] -> [[a]]
+sortByLength = sortBy (\xs ys -> compare (length xs) (length ys)) 
+
+-- exercise 7 and 8
+intersperce :: a -> [[a]] -> [a]
+intersperce seperator [] = []
+intersperce seperator xs = foldr1 (\x acc -> x ++ [seperator] ++ acc) xs
+
+-- exercise 9 see tree.hs
+-- exercise 10
 
 
--- myLength_test :: [a] -> Bool
--- myLength_test xs = myLength xs == length xs
--- 
--- 
--- 
--- 
--- main = do
---     quickCheck myLength_test
+-- tests --
+myLength_test :: [a] -> Bool
+myLength_test xs = myLength xs == (length xs)
+
+palindrome_test :: (Eq a) => [a] -> Bool
+palindrome_test = isPalindrome . palindrome 
+
+main = do
+    quickCheck (myLength_test :: [Int] -> Bool)
+    quickCheck (palindrome_test :: [Int] -> Bool)
